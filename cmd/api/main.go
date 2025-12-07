@@ -1,25 +1,16 @@
 package main
 
-import (
-	"net/http"
-	"tiagoapi/internal/api"
-)
+import "log"
 
 func main() {
-	api := &api.Api{Addr: ":8080"}
-
-	mux := http.NewServeMux()
-
-	srv := &http.Server{
-		Addr:    api.Addr,
-		Handler: mux,
+	cfg := config{
+		addr: ":8080",
+	}
+	app := &application{
+		config: cfg,
 	}
 
-	mux.HandleFunc("GET /users", api.GetUsersHandler)
-	mux.HandleFunc("POST /users", api.CreateUserHandler)
+	mux := app.mount()
 
-	err := srv.ListenAndServe()
-	if err != nil {
-		panic(err)
-	}
+	log.Fatal(app.run(mux))
 }
